@@ -1,0 +1,266 @@
+openapi: 3.0.0
+info:
+  title: Hot Totties
+  description: Base user API for LMS
+  version: 1.0.0
+servers:
+  - url: http://api-lsm.com
+    description: Main (production) server
+  - url: http://api-dev-lsm.com
+    description: Internal staging server for development environment.
+  - url: '{protocol}://localhost:8000'
+    variables:
+      protocol:
+        enum:
+          - http
+          - https
+        default: http
+components:
+  schemas:
+    User:
+      properties:
+        userId:
+          type: integer
+          example: 4352
+        name:
+          type: string
+          example: exampleUser123
+        firstName:
+          type: string
+          example: Emma
+        lastName:
+          type: string
+          example: Watson
+        email:
+          type: string
+          example: Emma@email.com
+        age:
+          type: string
+          example: 28
+          nullable: true
+        apps:
+          type: array
+          example: [
+            exampleApp1,
+            exampleApp2
+          ]
+          nullable: true
+      required:  
+        - id
+        - username
+        - firstName
+        - lastName
+        - email
+    Apps:
+      properties:
+        appId:
+          type: integer
+          example: 231
+        appName:
+          type: string
+          example: Example App
+        appType:
+          type: array
+          example: [ mobile, web ]
+          nullable: true
+      required:  
+        - id
+        - appName
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: /oauth/dialog
+          tokenUrl: /oauth/token
+security:
+  - OAuth2: []
+
+paths:
+  /users:
+    get:
+      operationId: getAllUsers
+      summary: returns a list of users
+      tags:
+        - Users
+      responses:
+        200:
+          description: get all users
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        400:
+          description: could not get all users
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/User'
+    post:
+      operationId: createUser
+      summary: Creates a user.
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+             $ref: '#/components/schemas/User'
+      responses: 
+        '201':
+          description: Created
+  /user/{userId}:
+    get:
+      summary: Returns a user by ID.
+      tags:
+        - Users
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/User'
+      responses: 
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    delete:
+      summary: Delete a user by ID.
+      tags:
+        - Users
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/User'
+      responses: 
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    put:
+      operationId: updateUser
+      summary: Update user by ID.
+      tags: 
+        - Users
+      parameters: 
+        - name: userId
+          in: path
+          description: User updates
+          required: true
+          schema:
+            $ref: '#/components/schemas/User'
+      responses:
+        200:
+          description: User Updated
+        500:
+          description: Internal Server Error User not updated.
+  /apps:
+    get:
+      operationId: getAllApps
+      summary: returns a list of all applications
+      tags:
+        - Apps
+      responses:
+        200:
+          description: get all applications
+          content:
+            application/json:
+              schema: 
+                type: array
+                items: 
+                  type: string
+        400:
+          description: could not get all 
+            applications
+    post:
+      operationId: createApp
+      summary: Creates an app.
+      tags:
+        - Apps
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Apps'
+      responses: 
+        201:
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Apps'
+        501:
+          description: Failed to create
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Apps'
+  /apps/{appId}:
+    get:
+      operationId: getApp
+      summary: Returns an app by ID.
+      tags:
+        - Apps
+      parameters:
+        - name: appId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Apps'
+      responses: 
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Apps'
+        400:
+          description: could not get app
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Apps'
+    delete:
+      summary: Delete an app by ID.
+      tags:
+        - Apps
+      parameters:
+        - name: appId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Apps'
+      responses: 
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Apps'
+    put:
+      operationId: updateApp
+      summary: Update application by ID.
+      tags: 
+        - Apps
+      parameters: 
+        - name: appId
+          in: path
+          description: App updates
+          required: true
+          schema:
+            $ref: '#/components/schemas/Apps'
+      responses:
+        200:
+          description: App Updated
+        500:
+          description: Internal Server Error User not updated.
+    
